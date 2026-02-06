@@ -11,4 +11,4 @@ WORKDIR /var/www/html
 EXPOSE 80
 
 # Arrancar PHP con su servidor embebido
-CMD ["php", "-S", "0.0.0.0:80", "-t", "/var/www/html"]
+CMD ["php", "-S", "0.0.0.0:80", "-t", "/var/www/html", "-d", "display_errors=1"]
