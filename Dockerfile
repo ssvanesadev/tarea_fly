@@ -1,7 +1,8 @@
 FROM php:8.2-apache
 
-# Desactivar MPMs que no deben usarse con PHP
-RUN a2dismod mpm_event mpm_worker \
+# Eliminar cualquier MPM existente a mano
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
+ && rm -f /etc/apache2/mods-enabled/mpm_*.conf \
  && a2enmod mpm_prefork
 
 # Instalar extensiones necesarias
