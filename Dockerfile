@@ -1,5 +1,9 @@
 FROM php:8.2-apache
 
+# Desactivar MPMs que no deben usarse con PHP
+RUN a2dismod mpm_event mpm_worker \
+ && a2enmod mpm_prefork
+
 # Instalar extensiones necesarias
 RUN docker-php-ext-install pdo pdo_mysql
 
