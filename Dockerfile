@@ -1,25 +1,26 @@
-FROM php:8.2-apache
+# Usamos PHP-FPM oficial
+FROM php:8.2-fpm
 
-# Eliminar MPM
-RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
- && rm -f /etc/apache2/mods-enabled/mpm_*.conf \
- && rm -f /etc/apache2/conf-enabled/mpm_*.conf \
- && rm -f /etc/apache2/conf-enabled/mpm_*.load \
- && a2enmod mpm_prefork
-
-# Instalar extensiones necesarias
+# Instalar extensiones necesarias para MySQL y otras utilidades
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Activar mod_rewrite (por si lo necesitas luego)
-RUN a2enmod rewrite
+# Instalar Nginx
+RUN apt-get update && apt-get install -y nginx supervisor \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copiar el código al directorio público de Apache
+# Copiar configuración de Nginx
+COPY nginx.conf /etc/nginx/sites-enabled/default
+
+# Copiar supervisor config para PHP-FPM + Nginx
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Copiar código de la aplicación
 COPY . /var/www/html/
 
-# Copiar init.sql
-COPY sql/init.sql /sql/init.sql
-
-# Permisos (Railway no suele dar problemas, pero es buena práctica)
-RUN chown -R www-data:www-data /var/www/html
+# Ajustar permisos
+RUN chown -R www-data:www-data /var/www/html/
 
 EXPOSE 80
+
+# Comando para arrancar supervisord (PHP-FPM + Nginx)
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
