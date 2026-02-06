@@ -1,8 +1,10 @@
 FROM php:8.2-apache
 
-# Eliminar cualquier MPM existente a mano
+# Eliminar MPM
 RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
  && rm -f /etc/apache2/mods-enabled/mpm_*.conf \
+ && rm -f /etc/apache2/conf-enabled/mpm_*.conf \
+ && rm -f /etc/apache2/conf-enabled/mpm_*.load \
  && a2enmod mpm_prefork
 
 # Instalar extensiones necesarias
